@@ -24,7 +24,7 @@ spec:
   git:
     checkout:
       ref:
-        branch: main
+        branch: master
     commit:
       author:
         email: git-robot@dwyor.xyz
