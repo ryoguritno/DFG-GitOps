@@ -84,7 +84,7 @@ metadata:
   namespace: playground-dfgjkt
 spec:
   rules:
-    - host: ipinfo.dwyor.xyz
+    - host: example-app.arkelo.net
       http:
         paths:
           - path: /
