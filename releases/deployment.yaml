@@ -7,7 +7,7 @@ spec:
   image: ryoguritno/example-app
   interval: 30s
   secretRef:
-    name: DOCKERUHUB_KEY
+    name: dockerhub-key
 
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
@@ -53,7 +53,7 @@ spec:
         app: example-app
     spec:
       imagePullSecrets:
-        - name: DOCKERUHUB_KEY
+        - name: dockerhub-key
       containers:
         - name: example-app
           image: ryoguritno/example-app:1.0.0 # {"$imagepolicy": "flux-system:example-app"}
