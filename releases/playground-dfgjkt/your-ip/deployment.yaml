@@ -1,0 +1,102 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: your-ip
+  namespace: flux-system
+spec:
+  image: ibnuislamy/your_ip
+  interval: 30s
+  secretRef:
+    name: dockerhub-key
+
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: your-ip
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: your-ip
+  policy:
+    semver:
+      range: '>=0.0.1'
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: your-ip-configs
+  namespace: playground-dfgjkt
+type: Opaque
+stringData:
+  APP_NAME: "your_ip"
+  ENV: "production"
+  PORT: "3000"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-ip
+  namespace: playground-dfgjkt
+  labels:
+    app: your-ip
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: your-ip
+  template:
+    metadata:
+      labels:
+        app: your-ip
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-key
+      containers:
+        - name: your-ip
+          image: ibnuislamy/your_ip:1.0.2 # {"$imagepolicy": "flux-system:your-ip"}
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: "your-ip-configs"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: your-ip
+  namespace: playground-dfgjkt
+  labels:
+    app: your-ip
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: your-ip
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: your-ip
+  namespace: playground-dfgjkt
+spec:
+  rules:
+    - host: ipinfo.dwyor.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: your-ip
+                port:
+                  number: 80
+  ingressClassName: traefik
