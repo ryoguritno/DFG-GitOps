@@ -47,7 +47,7 @@ spec:
         - {{ $resource.Kind }} {{ $resource.Name }}
         {{ end -}}
     push:
-      branch: main
+      branch: master
   update:
     path: ./releases
     strategy: Setters
