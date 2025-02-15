@@ -26,8 +26,29 @@ Selain itu temen2 juga perlu menyiapkan akun repository yg akan dipakai dalam wo
 
 5. ssh into controller kub
     run command: 
-        - `export GITHUB_TOKEN=<your_token>`
 
-        - `export KUBECONFIG=/etc/rancher/k3s/k3s.yaml`
+        ```
+        export GITHUB_TOKEN=<your_token>
         
-        - `flux bootstrap github --hostname=github.com --token-auth --owner=ryoguritno --repository=DFG-GitOps --branch=master --personal --components-extra=image-reflector-controller image-automation-controller --interval 30s --verbose`
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        ```
+
+6. setup flux-system on repo gitops
+
+7. create folder releases on root
+
+8. reconcile flux
+
+    ```
+    flux bootstrap github --hostname=github.com --token-auth --owner=ryoguritno --repository=DFG-GitOps --branch=master --personal --components-extra=image-reflector-controller,image-automation-controller --interval 30s --verbose
+    
+    flux reconcile ks flux-system --with-source
+    ```
+
+9. create secret on kube
+
+    ```
+    kubectl create secret docker-registry dockerhub-key --docker-server=https://index.docker.io/v1/ --docker-username=<username> --docker-password=<token_docker_for_flux_kube> --docker-email=<your_email> -n playground-dfgjkt
+
+    kubectl create secret docker-registry dockerhub-key --docker-server=https://index.docker.io/v1/ --docker-username=<username> --docker-password=<token_docker_for_flux_kube> --docker-email=<your_email> -n flux-system
+    ```
